@@ -1,0 +1,238 @@
+basePath: /
+definitions:
+  models.Response:
+    properties:
+      message:
+        type: string
+    type: object
+  models.Song:
+    properties:
+      group:
+        type: string
+      id:
+        type: integer
+      link:
+        type: string
+      release_date:
+        type: string
+      song:
+        type: string
+      text:
+        type: string
+    type: object
+  models.SongInput:
+    properties:
+      group:
+        maxLength: 255
+        minLength: 1
+        type: string
+      song:
+        maxLength: 255
+        minLength: 1
+        type: string
+    required:
+    - group
+    - song
+    type: object
+  models.UpdateSong:
+    properties:
+      group:
+        maxLength: 255
+        minLength: 1
+        type: string
+      link:
+        maxLength: 512
+        minLength: 1
+        type: string
+      release_date:
+        maxLength: 255
+        minLength: 1
+        type: string
+      song:
+        maxLength: 255
+        minLength: 1
+        type: string
+      text:
+        minLength: 1
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact: {}
+  description: REST API for MusicLib
+  title: MusicLib REST API
+  version: "1.0"
+paths:
+  /music:
+    get:
+      description: Lists songs with pagination and filtering
+      parameters:
+      - description: Group name
+        in: query
+        name: group
+        type: string
+      - description: Song name
+        in: query
+        name: song
+        type: string
+      - description: Release date of a song
+        in: query
+        name: releaseDate
+        type: string
+      - description: Lyrics
+        in: query
+        name: text
+        type: string
+      - description: Link of a song
+        in: query
+        name: link
+        type: string
+      - description: Page of the search for pagination
+        in: query
+        name: page
+        type: string
+      - description: Page size for pagination
+        in: query
+        name: pageSize
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Song'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Lists songs with pagination and filtering
+    post:
+      consumes:
+      - application/json
+      description: Adds song to DB
+      parameters:
+      - description: SongInput struct
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/models.SongInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Song'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Adds song to DB
+  /music/{id}:
+    delete:
+      description: Deletes song from DB
+      parameters:
+      - description: ID of a song
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Deletes song from DB
+    get:
+      description: Lists couplets of lyrics of a specific song based on Id
+      parameters:
+      - description: ID of a song
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Page of the search for pagination
+        in: query
+        name: page
+        type: string
+      - description: Number of couplets in one page for pagination
+        in: query
+        name: pageSize
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Lists couplets of lyrics of a specific song
+    put:
+      consumes:
+      - application/json
+      description: Updates song info
+      parameters:
+      - description: ID of a song
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: UpdateSong struct
+        in: body
+        name: song
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateSong'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/models.Song'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Updates song info
+swagger: "2.0"
